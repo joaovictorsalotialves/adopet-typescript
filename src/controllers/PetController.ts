@@ -4,15 +4,21 @@ import type TypePet from '../types/TypePet'
 
 const listPets: TypePet[] = []
 
+let id = 0
+function geraId() {
+  id = id + 1
+  return id
+}
+
 export default class PetController {
   createPet(req: Request, res: Response) {
-    const { id, adoption, species, age, name } = req.body as TypePet
+    const { adoption, species, dateOfBirth, name } = req.body as TypePet
 
     if (!Object.values(EnumSpecies).includes(species)) {
       return res.status(400).json({ message: 'Invalid species' })
     }
 
-    const newPet: TypePet = { id, adoption, species, age, name }
+    const newPet: TypePet = { id: geraId(), adoption, species, dateOfBirth, name }
     listPets.push(newPet)
     return res.status(201).json(newPet)
   }
@@ -23,7 +29,7 @@ export default class PetController {
 
   updatePet(req: Request, res: Response) {
     const { id } = req.params
-    const { adoption, species, age, name } = req.body as TypePet
+    const { adoption, species, dateOfBirth, name } = req.body as TypePet
 
     const pet = listPets.find(pet => pet.id === Number(id))
 
@@ -32,7 +38,7 @@ export default class PetController {
     }
 
     pet.name = name
-    pet.age = age
+    pet.dateOfBirth = dateOfBirth
     pet.species = species
     pet.adoption = adoption
 
