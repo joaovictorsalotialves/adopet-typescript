@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import EnumSpecies from '../enum/EnumSpecies'
+import type PetRepository from '../repositories/PetRepository'
 import type TypePet from '../types/TypePet'
 
 const listPets: TypePet[] = []
@@ -11,6 +12,8 @@ function geraId() {
 }
 
 export default class PetController {
+  constructor(private repository: PetRepository) {}
+
   createPet(req: Request, res: Response) {
     const { adoption, species, dateOfBirth, name } = req.body as TypePet
 
@@ -19,7 +22,7 @@ export default class PetController {
     }
 
     const newPet: TypePet = { id: geraId(), adoption, species, dateOfBirth, name }
-    listPets.push(newPet)
+    this.repository.createPet(newPet)
     return res.status(201).json(newPet)
   }
 
