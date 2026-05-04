@@ -1,4 +1,5 @@
 import type { Request, Response } from 'express'
+import Pet from '../entities/Pet'
 import EnumSpecies from '../enum/EnumSpecies'
 import type PetRepository from '../repositories/PetRepository'
 import type TypePet from '../types/TypePet'
@@ -15,13 +16,19 @@ export default class PetController {
   constructor(private repository: PetRepository) {}
 
   createPet(req: Request, res: Response) {
-    const { adoption, species, dateOfBirth, name } = req.body as TypePet
+    const { adoption, species, dateOfBirth, name } = req.body as Pet
 
     if (!Object.values(EnumSpecies).includes(species)) {
       return res.status(400).json({ message: 'Invalid species' })
     }
 
-    const newPet: TypePet = { id: geraId(), adoption, species, dateOfBirth, name }
+    const newPet: Pet = new Pet()
+    newPet.id = geraId()
+    newPet.adoption = adoption
+    newPet.species = species
+    newPet.dateOfBirth = dateOfBirth
+    newPet.name = name
+
     this.repository.createPet(newPet)
     return res.status(201).json(newPet)
   }
@@ -32,7 +39,7 @@ export default class PetController {
 
   updatePet(req: Request, res: Response) {
     const { id } = req.params
-    const { adoption, species, dateOfBirth, name } = req.body as TypePet
+    const { adoption, species, dateOfBirth, name } = req.body as Pet
 
     const pet = listPets.find(pet => pet.id === Number(id))
 
