@@ -15,7 +15,7 @@ function geraId() {
 export default class PetController {
   constructor(private repository: PetRepository) {}
 
-  createPet(req: Request, res: Response) {
+  async createPet(req: Request, res: Response) {
     const { adoption, species, dateOfBirth, name } = req.body as Pet
 
     if (!Object.values(EnumSpecies).includes(species)) {
@@ -29,15 +29,16 @@ export default class PetController {
     newPet.dateOfBirth = dateOfBirth
     newPet.name = name
 
-    this.repository.createPet(newPet)
+    await this.repository.createPet(newPet)
     return res.status(201).json(newPet)
   }
 
-  listPets(_req: Request, res: Response) {
-    return res.status(200).json(listPets)
+  async listPets(_req: Request, res: Response) {
+    const pets = await this.repository.listPets()
+    return res.status(200).json(pets)
   }
 
-  updatePet(req: Request, res: Response) {
+  async updatePet(req: Request, res: Response) {
     const { id } = req.params
     const { adoption, species, dateOfBirth, name } = req.body as Pet
 
@@ -55,7 +56,7 @@ export default class PetController {
     return res.status(200).json(pet)
   }
 
-  deletePet(req: Request, res: Response) {
+  async deletePet(req: Request, res: Response) {
     const { id } = req.params
 
     const pet = listPets.find(pet => pet.id === Number(id))

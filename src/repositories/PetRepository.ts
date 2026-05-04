@@ -9,19 +9,19 @@ export default class PetRepository implements IPetRepository {
     this.repository = repository
   }
 
-  createPet(pet: Pet): void {
-    this.repository.save(pet)
+  async createPet(pet: Pet): Promise<void> {
+    await this.repository.save(pet)
   }
 
-  listPets(): Pet[] {
+  async listPets(): Promise<Pet[]> {
+    return await this.repository.find()
+  }
+
+  async updatePet(id: number, pet: Pet): Promise<void> {
     throw new Error('Method not implemented.')
   }
 
-  updatePet(id: number, pet: Pet): void {
-    throw new Error('Method not implemented.')
-  }
-
-  deletePet(id: number): void {
+  async deletePet(id: number): Promise<void> {
     throw new Error('Method not implemented.')
   }
 }
