@@ -2,9 +2,6 @@ import type { Request, Response } from 'express'
 import Pet from '../entities/Pet'
 import EnumSpecies from '../enum/EnumSpecies'
 import type PetRepository from '../repositories/PetRepository'
-import type TypePet from '../types/TypePet'
-
-const listPets: TypePet[] = []
 
 let id = 0
 function geraId() {
@@ -33,6 +30,18 @@ export default class PetController {
     return res.status(201).json(newPet)
   }
 
+  async findPetById(req: Request, res: Response) {
+    const { id } = req.params
+
+    const pet = await this.repository.findPetById(Number(id))
+
+    if (!pet) {
+      return res.status(404).json({ message: 'Pet not found' })
+    }
+
+    return res.status(200).json(pet)
+  }
+
   async listPets(_req: Request, res: Response) {
     const pets = await this.repository.listPets()
     return res.status(200).json(pets)
@@ -40,33 +49,30 @@ export default class PetController {
 
   async updatePet(req: Request, res: Response) {
     const { id } = req.params
-    const { adoption, species, dateOfBirth, name } = req.body as Pet
+    const data = req.body as Pet
 
-    const pet = listPets.find(pet => pet.id === Number(id))
+    const pet = await this.repository.findPetById(Number(id))
 
     if (!pet) {
       return res.status(404).json({ message: 'Pet not found' })
     }
 
-    pet.name = name
-    pet.dateOfBirth = dateOfBirth
-    pet.species = species
-    pet.adoption = adoption
+    const updatedpet = await this.repository.updatePet(Number(id), data)
 
-    return res.status(200).json(pet)
+    return res.status(200).json(updatedpet)
   }
 
   async deletePet(req: Request, res: Response) {
     const { id } = req.params
 
-    const pet = listPets.find(pet => pet.id === Number(id))
+    const pet = await this.repository.findPetById(Number(id))
 
     if (!pet) {
       return res.status(404).json({ message: 'Pet not found' })
     }
 
-    const index = listPets.indexOf(pet)
-    listPets.splice(index, 1)
+    await this.repository.deletePet(Number(id))
+
     return res.status(200).json({ message: 'Pet deleted successfully' })
   }
 }

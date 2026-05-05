@@ -13,15 +13,20 @@ export default class PetRepository implements IPetRepository {
     await this.repository.save(pet)
   }
 
+  async findPetById(id: number): Promise<Pet | null> {
+    return await this.repository.findOne({ where: { id } })
+  }
+
   async listPets(): Promise<Pet[]> {
     return await this.repository.find()
   }
 
-  async updatePet(id: number, pet: Pet): Promise<void> {
-    throw new Error('Method not implemented.')
+  async updatePet(id: number, pet: Pet): Promise<Pet> {
+    await this.repository.update(id, pet)
+    return (await this.findPetById(id)) as Pet
   }
 
   async deletePet(id: number): Promise<void> {
-    throw new Error('Method not implemented.')
+    await this.repository.delete(id)
   }
 }
