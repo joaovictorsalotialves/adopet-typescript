@@ -6,11 +6,18 @@ export default class Pet {
   @PrimaryGeneratedColumn()
   id!: number
   @Column()
-  name!: string
+  name: string
   @Column()
-  species!: EnumSpecies
+  species: EnumSpecies
   @Column()
-  dateOfBirth!: Date
+  dateOfBirth: Date
   @Column()
-  adoption!: boolean
+  adoption: boolean
+
+  constructor(name: string, species: EnumSpecies, dateOfBirth: Date, adoption: boolean) {
+    this.name = name
+    this.species = species
+    this.dateOfBirth = dateOfBirth
+    this.adoption = adoption
+  }
 }
