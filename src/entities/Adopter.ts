@@ -10,12 +10,12 @@ export default class Adopter {
   password: string
   @Column()
   cellPhone: string
-  @Column()
-  photo: string
-  @Column()
-  address: string
+  @Column({nullable: true})
+  photo?: string
+  @Column({nullable: true})
+  address?: string
 
-  constructor(name: string, password: string, cellPhone: string, photo: string, address: string) {
+  constructor(name: string, password: string, cellPhone: string, photo?: string, address?: string) {
     this.name = name
     this.password = password
     this.cellPhone = cellPhone

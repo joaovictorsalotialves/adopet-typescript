@@ -8,7 +8,7 @@ export default class AdopterController {
   async createAdopter(req: Request, res: Response) {
     const { name, password, address, cellPhone, photo } = req.body as Adopter
 
-    const newAdopter: Adopter = new Adopter(name, password, address, cellPhone, photo)
+    const newAdopter: Adopter = new Adopter(name, password, cellPhone, photo, address)
 
     await this.repository.createAdopter(newAdopter)
     return res.status(201).json(newAdopter)
