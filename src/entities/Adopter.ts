@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm'
+import Address from './Address'
 
 @Entity()
 export default class Adopter {
@@ -12,10 +13,11 @@ export default class Adopter {
   cellPhone: string
   @Column({nullable: true})
   photo?: string
-  @Column({nullable: true})
-  address?: string
+  @OneToOne(() => Address, { nullable: true, cascade: true, eager: true })
+  @JoinColumn()
+  address?: Address
 
-  constructor(name: string, password: string, cellPhone: string, photo?: string, address?: string) {
+  constructor(name: string, password: string, cellPhone: string, photo?: string, address?: Address) {
     this.name = name
     this.password = password
     this.cellPhone = cellPhone
