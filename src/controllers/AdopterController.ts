@@ -1,0 +1,62 @@
+import type { Request, Response } from 'express'
+import Adopter from '../entities/Adopter'
+import type AdopterRepository from '../repositories/AdopterRepository'
+
+export default class AdopterController {
+  constructor(private repository: AdopterRepository) {}
+
+  async createAdopter(req: Request, res: Response) {
+    const { name, password, address, cellPhone, photo } = req.body as Adopter
+
+    const newAdopter: Adopter = new Adopter(name, password, address, cellPhone, photo)
+
+    await this.repository.createAdopter(newAdopter)
+    return res.status(201).json(newAdopter)
+  }
+
+  async findAdopterById(req: Request, res: Response) {
+    const { id } = req.params
+
+    const adopter = await this.repository.findAdopterById(Number(id))
+
+    if (!adopter) {
+      return res.status(404).json({ message: 'Adopter not found' })
+    }
+
+    return res.status(200).json(adopter)
+  }
+
+  async listAdopters(_req: Request, res: Response) {
+    const adopters = await this.repository.listAdopters()
+    return res.status(200).json(adopters)
+  }
+
+  async updateAdopter(req: Request, res: Response) {
+    const { id } = req.params
+    const data = req.body as Adopter
+
+    const adopter = await this.repository.findAdopterById(Number(id))
+
+    if (!adopter) {
+      return res.status(404).json({ message: 'Adopter not found' })
+    }
+
+    const updatedAdopter = await this.repository.updateAdopter(Number(id), data)
+
+    return res.status(200).json(updatedAdopter)
+  }
+
+    async deleteAdopter(req: Request, res: Response) {
+    const { id } = req.params
+
+    const adopter = await this.repository.findAdopterById(Number(id))
+
+    if (!adopter) {
+      return res.status(404).json({ message: 'Adopter not found' })
+    }
+
+    await this.repository.deleteAdopter(Number(id))
+
+    return res.status(200).json({ message: 'Adopter deleted successfully' })
+  }
+}

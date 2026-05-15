@@ -46,9 +46,13 @@ export default class PetController {
       return res.status(404).json({ message: 'Pet not found' })
     }
 
-    const updatedpet = await this.repository.updatePet(Number(id), data)
+    if (!Object.values(EnumSpecies).includes(data.species)) {
+      return res.status(400).json({ message: 'Invalid species' })
+    }
 
-    return res.status(200).json(updatedpet)
+    const updatedPet = await this.repository.updatePet(Number(id), data)
+
+    return res.status(200).json(updatedPet)
   }
 
   async deletePet(req: Request, res: Response) {
