@@ -1,6 +1,7 @@
 import type { Repository } from 'typeorm'
 import type Adopter from '../entities/Adopter'
 import type IAdopterRepository from './interfaces/InterfaceAdopterRepository'
+import Address from '../entities/Address'
 
 export default class AdopterRepository implements IAdopterRepository {
   private repository: Repository<Adopter>
@@ -28,5 +29,19 @@ export default class AdopterRepository implements IAdopterRepository {
 
   async deleteAdopter(id: number): Promise<void> {
     await this.repository.delete(id)
+  }
+
+  async updateAddressAdopter(id: number, address: Address): Promise<Adopter> {
+    const adopter = await this.findAdopterById(id)
+
+    if (!adopter) {
+      throw new Error('Adopter not found')
+    }
+
+    const newAddress = new Address(address.city, address.state)
+    adopter.address = newAddress
+    await this.repository.save(adopter)
+
+    return (await this.findAdopterById(id)) as Adopter 
   }
 }

@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import Adopter from '../entities/Adopter'
 import type AdopterRepository from '../repositories/AdopterRepository'
+import Address from '../entities/Address'
 
 export default class AdopterController {
   constructor(private repository: AdopterRepository) {}
@@ -46,7 +47,7 @@ export default class AdopterController {
     return res.status(200).json(updatedAdopter)
   }
 
-    async deleteAdopter(req: Request, res: Response) {
+  async deleteAdopter(req: Request, res: Response) {
     const { id } = req.params
 
     const adopter = await this.repository.findAdopterById(Number(id))
@@ -58,5 +59,22 @@ export default class AdopterController {
     await this.repository.deleteAdopter(Number(id))
 
     return res.status(200).json({ message: 'Adopter deleted successfully' })
+  }
+
+  async updateAddressAdopter(req: Request, res: Response) {
+    const { id } = req.params
+    const { city, state } = req.body as Address
+
+    const address = new Address(city, state)
+
+    const adopter = await this.repository.findAdopterById(Number(id))
+
+    if (!adopter) {
+      return res.status(404).json({ message: 'Adopter not found' })
+    }
+
+    const updatedAdopter = await this.repository.updateAddressAdopter(Number(id), address)
+
+    return res.status(200).json(updatedAdopter)
   }
 }
