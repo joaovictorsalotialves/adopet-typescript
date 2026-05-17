@@ -7,13 +7,13 @@ export default class PetController {
   constructor(private repository: PetRepository) {}
 
   async createPet(req: Request, res: Response) {
-    const { name, adoption, species, dateOfBirth } = req.body as Pet
+    const { name, adoption, species, dateOfBirth, adopter } = req.body as Pet
 
     if (!Object.values(EnumSpecies).includes(species)) {
       return res.status(400).json({ message: 'Invalid species' })
     }
 
-    const newPet: Pet = new Pet(name, species, dateOfBirth, adoption)
+    const newPet: Pet = new Pet(name, species, dateOfBirth, adoption, adopter)
 
     await this.repository.createPet(newPet)
     return res.status(201).json(newPet)
@@ -67,5 +67,12 @@ export default class PetController {
     await this.repository.deletePet(Number(id))
 
     return res.status(200).json({ message: 'Pet deleted successfully' })
+  }
+
+  async addPetToAdopter(req: Request, res: Response) {
+    const { adopterId, petId } = req.params
+
+    await this.repository.addPetToAdopter(Number(adopterId), Number(petId))
+    return res.status(200).json({ message: 'Pet added to adopter successfully' })
   }
 }

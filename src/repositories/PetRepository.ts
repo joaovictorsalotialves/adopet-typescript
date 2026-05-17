@@ -1,32 +1,54 @@
 import type { Repository } from 'typeorm'
 import type Pet from '../entities/Pet'
 import type IPetRepository from './interfaces/InterfacePetRepository'
+import Adopter from '../entities/Adopter'
 
 export default class PetRepository implements IPetRepository {
-  private repository: Repository<Pet>
+  private petRepository: Repository<Pet>
+  private adopterRepository: Repository<Adopter>
 
-  constructor(repository: Repository<Pet>) {
-    this.repository = repository
+  constructor(petRepository: Repository<Pet>, adopterRepository: Repository<Adopter>) {
+    this.petRepository = petRepository
+    this.adopterRepository = adopterRepository
   }
 
   async createPet(pet: Pet): Promise<void> {
-    await this.repository.save(pet)
+    await this.petRepository.save(pet)
   }
 
   async findPetById(id: number): Promise<Pet | null> {
-    return await this.repository.findOne({ where: { id } })
+    return await this.petRepository.findOne({ where: { id } })
   }
 
   async listPets(): Promise<Pet[]> {
-    return await this.repository.find()
+    return await this.petRepository.find()
   }
 
   async updatePet(id: number, pet: Pet): Promise<Pet> {
-    await this.repository.update(id, pet)
+    await this.petRepository.update(id, pet)
     return (await this.findPetById(id)) as Pet
   }
 
   async deletePet(id: number): Promise<void> {
-    await this.repository.delete(id)
+    await this.petRepository.delete(id)
+  }
+
+  async addPetToAdopter(adopterId: number, petId: number): Promise<void> {
+    const adopter = await this.adopterRepository.findOne({ where: { id: adopterId } })
+
+    if (!adopter) {
+      throw new Error('Adopter not found')
+    }
+
+    const pet = await this.findPetById(Number(petId))
+
+    if (!pet) {
+      throw new Error('Pet not found')
+    }
+
+    pet.adopter = adopter
+    pet.adoption = true
+
+    await this.petRepository.save(pet)
   }
 }
