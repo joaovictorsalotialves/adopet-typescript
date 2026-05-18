@@ -2,18 +2,23 @@ import type { Request, Response } from 'express'
 import Pet from '../entities/Pet'
 import EnumSpecies from '../enum/EnumSpecies'
 import type PetRepository from '../repositories/PetRepository'
+import EnumSize from '../enum/EnumSize'
 
 export default class PetController {
   constructor(private repository: PetRepository) {}
 
   async createPet(req: Request, res: Response) {
-    const { name, adoption, species, dateOfBirth, adopter } = req.body as Pet
+    const { name, adoption, species, size, dateOfBirth } = req.body as Pet
 
     if (!Object.values(EnumSpecies).includes(species)) {
       return res.status(400).json({ message: 'Invalid species' })
     }
 
-    const newPet: Pet = new Pet(name, species, dateOfBirth, adoption, adopter)
+    if (size && !(size in EnumSize)) {
+      return res.status(400).json({ message: 'Invalid size' })
+    }
+
+    const newPet: Pet = new Pet(name, species, dateOfBirth, adoption, size)
 
     await this.repository.createPet(newPet)
     return res.status(201).json(newPet)
