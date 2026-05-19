@@ -29,6 +29,10 @@ export default class PetRepository implements IPetRepository {
     return await this.petRepository.find({ where: { size } })
   }
 
+  async searchPetsByGenericField<T extends keyof Pet>(field: T, value: Pet[T]): Promise<Pet[]> {
+    return await this.petRepository.find({ where: { [field]: value } })
+  }
+
   async updatePet(id: number, pet: Pet): Promise<Pet> {
     await this.petRepository.update(id, pet)
     return (await this.findPetById(id)) as Pet

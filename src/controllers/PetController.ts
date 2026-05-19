@@ -52,6 +52,17 @@ export default class PetController {
     return res.status(200).json(pets)
   }
 
+  async searchPetsByGenericField(req: Request, res: Response) {
+    const { field, value } = req.query
+
+    if (!field || !value) {
+      return res.status(400).json({ message: 'Field and value are required' })
+    }
+
+    const pets = await this.repository.searchPetsByGenericField(field as keyof Pet, value as Pet[keyof Pet])
+    return res.status(200).json(pets)
+  }
+
   async updatePet(req: Request, res: Response) {
     const { id } = req.params
     const data = req.body as Pet
