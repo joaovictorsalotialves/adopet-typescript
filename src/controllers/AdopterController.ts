@@ -1,21 +1,22 @@
 import type { Request, Response } from 'express'
+import Address from '../entities/Address'
 import Adopter from '../entities/Adopter'
 import type AdopterRepository from '../repositories/AdopterRepository'
-import Address from '../entities/Address'
+import type { TypeRequestBodyAdopter, TypeResponseBodyAdopter } from '../types/TypeAdopter'
 
 export default class AdopterController {
   constructor(private repository: AdopterRepository) {}
 
-  async createAdopter(req: Request, res: Response) {
+  async createAdopter(req: Request<{}, {}, TypeRequestBodyAdopter>, res: Response<TypeResponseBodyAdopter>) {
     const { name, password, address, pets, cellPhone, photo } = req.body as Adopter
 
     const newAdopter: Adopter = new Adopter(name, password, cellPhone, pets, photo, address)
 
     await this.repository.createAdopter(newAdopter)
-    return res.status(201).json(newAdopter)
+    return res.status(201).json({ data: newAdopter })
   }
 
-  async findAdopterById(req: Request, res: Response) {
+  async findAdopterById(req: Request, res: Response<TypeResponseBodyAdopter>) {
     const { id } = req.params
 
     const adopter = await this.repository.findAdopterById(Number(id))
@@ -24,7 +25,7 @@ export default class AdopterController {
       return res.status(404).json({ message: 'Adopter not found' })
     }
 
-    return res.status(200).json(adopter)
+    return res.status(200).json({ data: { id: adopter.id, name: adopter.name, cellPhone: adopter.cellPhone } })
   }
 
   async listAdopters(_req: Request, res: Response) {
