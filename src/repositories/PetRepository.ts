@@ -1,7 +1,8 @@
 import type { Repository } from 'typeorm'
+import type Adopter from '../entities/Adopter'
 import type Pet from '../entities/Pet'
+import type EnumSize from '../enum/EnumSize'
 import type IPetRepository from './interfaces/InterfacePetRepository'
-import Adopter from '../entities/Adopter'
 
 export default class PetRepository implements IPetRepository {
   private petRepository: Repository<Pet>
@@ -22,6 +23,10 @@ export default class PetRepository implements IPetRepository {
 
   async listPets(): Promise<Pet[]> {
     return await this.petRepository.find()
+  }
+
+  async searchPetsBySize(size: EnumSize): Promise<Pet[]> {
+    return await this.petRepository.find({ where: { size } })
   }
 
   async updatePet(id: number, pet: Pet): Promise<Pet> {

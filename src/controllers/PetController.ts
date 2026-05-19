@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express'
 import Pet from '../entities/Pet'
+import EnumSize from '../enum/EnumSize'
 import EnumSpecies from '../enum/EnumSpecies'
 import type PetRepository from '../repositories/PetRepository'
-import EnumSize from '../enum/EnumSize'
 
 export default class PetController {
   constructor(private repository: PetRepository) {}
@@ -38,6 +38,17 @@ export default class PetController {
 
   async listPets(_req: Request, res: Response) {
     const pets = await this.repository.listPets()
+    return res.status(200).json(pets)
+  }
+
+  async searchPetsBySize(req: Request, res: Response) {
+    const { size } = req.query
+
+    if (!Object.values(EnumSize).includes(size as EnumSize)) {
+      return res.status(400).json({ message: 'Invalid size' })
+    }
+
+    const pets = await this.repository.searchPetsBySize(size as EnumSize)
     return res.status(200).json(pets)
   }
 
