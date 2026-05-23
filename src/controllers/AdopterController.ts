@@ -22,9 +22,18 @@ export default class AdopterController {
 
     let bodyValidated: TypeRequestBodyAdopter
     try {
-      bodyValidated = await adopterBodyValidator.validate(req.body)
+      bodyValidated = await adopterBodyValidator.validate(req.body, { abortEarly: false })
     } catch (error) {
-      return res.status(400).json({ message: (error as yup.ValidationError).message })
+      const yupErrors = error as yup.ValidationError
+
+      const validationErrors: Record<string, string> = {}
+
+      yupErrors.inner.forEach(error => {
+        if (!error.path) return
+        validationErrors[error.path] = error.message
+      })
+
+      return res.status(400).json({ message: validationErrors })
     }
 
     await this.repository.createAdopter(newAdopter)
