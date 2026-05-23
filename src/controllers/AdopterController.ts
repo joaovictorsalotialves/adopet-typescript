@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import Address from '../entities/Address'
 import Adopter from '../entities/Adopter'
 import type AdopterRepository from '../repositories/AdopterRepository'
-import type { TypeRequestBodyAdopter, TypeResponseBodyAdopter } from '../types/TypeAdopter'
+import type { TypeRequestBodyAdopter, TypeRequestParamsAdopter, TypeResponseBodyAdopter } from '../types/TypeAdopter'
 
 export default class AdopterController {
   constructor(private repository: AdopterRepository) {}
@@ -16,7 +16,10 @@ export default class AdopterController {
     return res.status(201).json({ data: newAdopter })
   }
 
-  async findAdopterById(req: Request, res: Response<TypeResponseBodyAdopter>) {
+  async findAdopterById(
+    req: Request<TypeRequestParamsAdopter, {}, TypeRequestBodyAdopter>,
+    res: Response<TypeResponseBodyAdopter>
+  ) {
     const { id } = req.params
 
     const adopter = await this.repository.findAdopterById(Number(id))
@@ -28,12 +31,21 @@ export default class AdopterController {
     return res.status(200).json({ data: { id: adopter.id, name: adopter.name, cellPhone: adopter.cellPhone } })
   }
 
-  async listAdopters(_req: Request, res: Response) {
+  async listAdopters(
+    _req: Request<TypeRequestParamsAdopter, {}, TypeRequestBodyAdopter>,
+    res: Response<TypeResponseBodyAdopter>
+  ) {
     const adopters = await this.repository.listAdopters()
-    return res.status(200).json(adopters)
+    const data = adopters.map(adopter => {
+      return { id: adopter.id, name: adopter.name, cellPhone: adopter.cellPhone }
+    })
+    return res.status(200).json({ data })
   }
 
-  async updateAdopter(req: Request, res: Response) {
+  async updateAdopter(
+    req: Request<TypeRequestParamsAdopter, {}, TypeRequestBodyAdopter>,
+    res: Response<TypeResponseBodyAdopter>
+  ) {
     const { id } = req.params
     const data = req.body as Adopter
 
@@ -45,10 +57,19 @@ export default class AdopterController {
 
     const updatedAdopter = await this.repository.updateAdopter(Number(id), data)
 
-    return res.status(200).json(updatedAdopter)
+    return res.status(200).json({
+      data: {
+        id: updatedAdopter.id,
+        name: updatedAdopter.name,
+        cellPhone: updatedAdopter.cellPhone,
+      },
+    })
   }
 
-  async deleteAdopter(req: Request, res: Response) {
+  async deleteAdopter(
+    req: Request<TypeRequestParamsAdopter, {}, TypeRequestBodyAdopter>,
+    res: Response<TypeResponseBodyAdopter>
+  ) {
     const { id } = req.params
 
     const adopter = await this.repository.findAdopterById(Number(id))
@@ -62,9 +83,12 @@ export default class AdopterController {
     return res.status(200).json({ message: 'Adopter deleted successfully' })
   }
 
-  async updateAddressAdopter(req: Request, res: Response) {
+  async updateAddressAdopter(
+    req: Request<TypeRequestParamsAdopter, {}, TypeRequestBodyAdopter>,
+    res: Response<TypeResponseBodyAdopter>
+  ) {
     const { id } = req.params
-    const { city, state } = req.body as Address
+    const { city, state } = req.body.address as Address
 
     const address = new Address(city, state)
 
@@ -76,6 +100,6 @@ export default class AdopterController {
 
     const updatedAdopter = await this.repository.updateAddressAdopter(Number(id), address)
 
-    return res.status(200).json(updatedAdopter)
+    return res.status(200).json({ data: updatedAdopter })
   }
 }
