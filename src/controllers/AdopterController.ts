@@ -1,16 +1,31 @@
 import type { Request, Response } from 'express'
+import * as yup from 'yup'
 import Address from '../entities/Address'
 import Adopter from '../entities/Adopter'
 import type AdopterRepository from '../repositories/AdopterRepository'
 import type { TypeRequestBodyAdopter, TypeRequestParamsAdopter, TypeResponseBodyAdopter } from '../types/TypesAdopter'
 
+const adopterBodyValidator: yup.ObjectSchema<Omit<TypeRequestBodyAdopter, 'address'>> = yup.object({
+  name: yup.string().defined().required(),
+  cellPhone: yup.string().defined().required(),
+  password: yup.string().defined().required().min(6),
+  photo: yup.string().optional(),
+})
+
 export default class AdopterController {
   constructor(private repository: AdopterRepository) {}
 
   async createAdopter(req: Request<{}, {}, TypeRequestBodyAdopter>, res: Response<TypeResponseBodyAdopter>) {
-    const { name, password, address, pets, cellPhone, photo } = req.body as Adopter
+    const { name, password, address, cellPhone, photo } = req.body as Adopter
 
-    const newAdopter: Adopter = new Adopter(name, password, cellPhone, pets, photo, address)
+    const newAdopter: Adopter = new Adopter(name, password, cellPhone, photo, address)
+
+    let bodyValidated: TypeRequestBodyAdopter
+    try {
+      bodyValidated = await adopterBodyValidator.validate(req.body)
+    } catch (error) {
+      return res.status(400).json({ message: (error as yup.ValidationError).message })
+    }
 
     await this.repository.createAdopter(newAdopter)
     return res.status(201).json({ data: newAdopter })
