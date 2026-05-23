@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import Address from '../entities/Address'
 import Adopter from '../entities/Adopter'
 import type AdopterRepository from '../repositories/AdopterRepository'
-import type { TypeRequestBodyAdopter, TypeRequestParamsAdopter, TypeResponseBodyAdopter } from '../types/TypeAdopter'
+import type { TypeRequestBodyAdopter, TypeRequestParamsAdopter, TypeResponseBodyAdopter } from '../types/TypesAdopter'
 
 export default class AdopterController {
   constructor(private repository: AdopterRepository) {}

@@ -3,11 +3,12 @@ import Pet from '../entities/Pet'
 import EnumSize from '../enum/EnumSize'
 import EnumSpecies from '../enum/EnumSpecies'
 import type PetRepository from '../repositories/PetRepository'
+import type { TypeRequestBodyPet, TypeRequestParamsPet, TypeResponseBodyPet } from '../types/TypesPet'
 
 export default class PetController {
   constructor(private repository: PetRepository) {}
 
-  async createPet(req: Request, res: Response) {
+  async createPet(req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>, res: Response<TypeResponseBodyPet>) {
     const { name, adoption, species, size, dateOfBirth } = req.body as Pet
 
     if (!Object.values(EnumSpecies).includes(species)) {
@@ -21,10 +22,17 @@ export default class PetController {
     const newPet: Pet = new Pet(name, species, dateOfBirth, adoption, size)
 
     await this.repository.createPet(newPet)
-    return res.status(201).json(newPet)
+    return res.status(201).json({
+      data: {
+        id: newPet.id,
+        name: newPet.name,
+        species: newPet.species,
+        size: newPet.size,
+      },
+    })
   }
 
-  async findPetById(req: Request, res: Response) {
+  async findPetById(req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>, res: Response<TypeResponseBodyPet>) {
     const { id } = req.params
 
     const pet = await this.repository.findPetById(Number(id))
@@ -33,15 +41,28 @@ export default class PetController {
       return res.status(404).json({ message: 'Pet not found' })
     }
 
-    return res.status(200).json(pet)
+    return res.status(200).json({
+      data: {
+        id: pet.id,
+        name: pet.name,
+        species: pet.species,
+        size: pet.size,
+      },
+    })
   }
 
-  async listPets(_req: Request, res: Response) {
+  async listPets(_req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>, res: Response<TypeResponseBodyPet>) {
     const pets = await this.repository.listPets()
-    return res.status(200).json(pets)
+    const data = pets.map(pet => {
+      return { id: pet.id, name: pet.name, species: pet.species, size: pet.size }
+    })
+    return res.status(200).json({ data })
   }
 
-  async searchPetsBySize(req: Request, res: Response) {
+  async searchPetsBySize(
+    req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>,
+    res: Response<TypeResponseBodyPet>
+  ) {
     const { size } = req.query
 
     if (!Object.values(EnumSize).includes(size as EnumSize)) {
@@ -49,10 +70,17 @@ export default class PetController {
     }
 
     const pets = await this.repository.searchPetsBySize(size as EnumSize)
-    return res.status(200).json(pets)
+
+    const data = pets.map(pet => {
+      return { id: pet.id, name: pet.name, species: pet.species, size: pet.size }
+    })
+    return res.status(200).json({ data })
   }
 
-  async searchPetsByGenericField(req: Request, res: Response) {
+  async searchPetsByGenericField(
+    req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>,
+    res: Response<TypeResponseBodyPet>
+  ) {
     const { field, value } = req.query
 
     if (!field || !value) {
@@ -60,10 +88,14 @@ export default class PetController {
     }
 
     const pets = await this.repository.searchPetsByGenericField(field as keyof Pet, value as Pet[keyof Pet])
-    return res.status(200).json(pets)
+
+    const data = pets.map(pet => {
+      return { id: pet.id, name: pet.name, species: pet.species, size: pet.size }
+    })
+    return res.status(200).json({ data })
   }
 
-  async updatePet(req: Request, res: Response) {
+  async updatePet(req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>, res: Response<TypeResponseBodyPet>) {
     const { id } = req.params
     const data = req.body as Pet
 
@@ -79,10 +111,17 @@ export default class PetController {
 
     const updatedPet = await this.repository.updatePet(Number(id), data)
 
-    return res.status(200).json(updatedPet)
+    return res.status(200).json({
+      data: {
+        id: updatedPet.id,
+        name: updatedPet.name,
+        species: updatedPet.species,
+        size: updatedPet.size,
+      },
+    })
   }
 
-  async deletePet(req: Request, res: Response) {
+  async deletePet(req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>, res: Response<TypeResponseBodyPet>) {
     const { id } = req.params
 
     const pet = await this.repository.findPetById(Number(id))
@@ -96,7 +135,10 @@ export default class PetController {
     return res.status(200).json({ message: 'Pet deleted successfully' })
   }
 
-  async addPetToAdopter(req: Request, res: Response) {
+  async addPetToAdopter(
+    req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>,
+    res: Response<TypeResponseBodyPet>
+  ) {
     const { adopterId, petId } = req.params
 
     await this.repository.addPetToAdopter(Number(adopterId), Number(petId))
