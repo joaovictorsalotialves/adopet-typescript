@@ -1,6 +1,7 @@
-import express from 'express'
+import express, { type RequestHandler } from 'express'
 import { AppDataSource } from '../config/dataSource'
 import AdopterController from '../controllers/AdopterController'
+import { middlewareValidateAdopterBody } from '../middleware/validators/adopterRequestBody'
 import AdopterRepository from '../repositories/AdopterRepository'
 
 const router = express.Router()
@@ -8,7 +9,9 @@ const router = express.Router()
 const adopterRepository = new AdopterRepository(AppDataSource.getRepository('Adopter'))
 const adopterController = new AdopterController(adopterRepository)
 
-router.post('/', (req, res) => adopterController.createAdopter(req, res))
+const validateAdopterBody: RequestHandler = (req, res, next) => middlewareValidateAdopterBody(req, res, next)
+
+router.post('/', validateAdopterBody, (req, res) => adopterController.createAdopter(req, res))
 router.get('/', (req, res) => adopterController.listAdopters(req, res))
 router.put('/:id', (req, res) => adopterController.updateAdopter(req, res))
 router.patch('/:id', (req, res) => adopterController.updateAddressAdopter(req, res))
