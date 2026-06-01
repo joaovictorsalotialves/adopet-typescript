@@ -4,7 +4,11 @@ import type { TypeRequestBodyAdopter } from '../../types/TypesAdopter'
 
 const schemaAdopterBody: yup.ObjectSchema<Omit<TypeRequestBodyAdopter, 'address'>> = yup.object({
   name: yup.string().defined().required(),
-  cellPhone: yup.string().defined().required(),
+  cellPhone: yup
+    .string()
+    .defined()
+    .required()
+    .matches(/^(\(?[0-9]{2}\)?)? ?([0-9]{4,5})-?([0-9]{4})$/gm, 'Invalid cell phone format'),
   password: yup.string().defined().required().min(6),
   photo: yup.string().optional(),
 })
