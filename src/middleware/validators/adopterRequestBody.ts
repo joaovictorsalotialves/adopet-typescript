@@ -1,6 +1,9 @@
 import type { NextFunction, Request, Response } from 'express'
 import * as yup from 'yup'
+import { pt } from 'yup-locale-pt'
 import type { TypeRequestBodyAdopter } from '../../types/TypesAdopter'
+
+yup.setLocale(pt)
 
 const schemaAdopterBody: yup.ObjectSchema<Omit<TypeRequestBodyAdopter, 'address'>> = yup.object({
   name: yup.string().defined().required(),
