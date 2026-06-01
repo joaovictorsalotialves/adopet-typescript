@@ -31,7 +31,14 @@ export default class AdopterController {
       return res.status(404).json({ message: 'Adopter not found' })
     }
 
-    return res.status(200).json({ data: { id: adopter.id, name: adopter.name, cellPhone: adopter.cellPhone } })
+    return res.status(200).json({
+      data: {
+        id: adopter.id,
+        name: adopter.name,
+        cellPhone: adopter.cellPhone,
+        address: adopter.address !== null ? adopter.address : undefined,
+      },
+    })
   }
 
   async listAdopters(
@@ -40,7 +47,12 @@ export default class AdopterController {
   ) {
     const adopters = await this.repository.listAdopters()
     const data = adopters.map(adopter => {
-      return { id: adopter.id, name: adopter.name, cellPhone: adopter.cellPhone }
+      return {
+        id: adopter.id,
+        name: adopter.name,
+        cellPhone: adopter.cellPhone,
+        address: adopter.address !== null ? adopter.address : undefined,
+      }
     })
     return res.status(200).json({ data })
   }
@@ -87,11 +99,11 @@ export default class AdopterController {
   }
 
   async updateAddressAdopter(
-    req: Request<TypeRequestParamsAdopter, {}, TypeRequestBodyAdopter>,
+    req: Request<TypeRequestParamsAdopter, {}, Address>,
     res: Response<TypeResponseBodyAdopter>
   ) {
     const { id } = req.params
-    const { city, state } = req.body.address as Address
+    const { city, state } = req.body
 
     const address = new Address(city, state)
 
