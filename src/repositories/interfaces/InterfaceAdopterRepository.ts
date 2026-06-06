@@ -1,4 +1,4 @@
-import Address from '../../entities/Address'
+import type Address from '../../entities/Address'
 import type Adopter from '../../entities/Adopter'
 
 export default interface IAdopterRepository {

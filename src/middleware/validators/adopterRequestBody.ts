@@ -2,6 +2,7 @@ import type { NextFunction, Request, Response } from 'express'
 import * as yup from 'yup'
 import { pt } from 'yup-locale-pt'
 import type { TypeRequestBodyAdopter } from '../../types/TypesAdopter'
+import validatorYup from '../../utils/validatorYup'
 
 yup.setLocale(pt)
 
@@ -24,21 +25,7 @@ const schemaAdopterBody: yup.ObjectSchema<Omit<TypeRequestBodyAdopter, 'address'
 })
 
 const middlewareValidateAdopterBody = async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    await schemaAdopterBody.validate(req.body, { abortEarly: false })
-    return next()
-  } catch (error) {
-    const yupErrors = error as yup.ValidationError
-
-    const validationErrors: Record<string, string> = {}
-
-    yupErrors.inner.forEach(error => {
-      if (!error.path) return
-      validationErrors[error.path] = error.message
-    })
-
-    return res.status(400).json({ message: validationErrors })
-  }
+  validatorYup(schemaAdopterBody, req, res, next)
 }
 
 export { middlewareValidateAdopterBody }
