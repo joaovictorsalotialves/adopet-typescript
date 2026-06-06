@@ -1,7 +1,7 @@
 import type { Repository } from 'typeorm'
+import Address from '../entities/Address'
 import type Adopter from '../entities/Adopter'
 import type IAdopterRepository from './interfaces/InterfaceAdopterRepository'
-import Address from '../entities/Address'
 
 export default class AdopterRepository implements IAdopterRepository {
   private repository: Repository<Adopter>
@@ -42,6 +42,6 @@ export default class AdopterRepository implements IAdopterRepository {
     adopter.address = newAddress
     await this.repository.save(adopter)
 
-    return (await this.findAdopterById(id)) as Adopter 
+    return (await this.findAdopterById(id)) as Adopter
   }
 }

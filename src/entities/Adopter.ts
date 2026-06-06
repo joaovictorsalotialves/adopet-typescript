@@ -34,7 +34,7 @@ export default class Adopter {
 
   @BeforeInsert()
   @BeforeUpdate()
-  private async criptographPassword(password: string) {
+  private async criptographPassword() {
     this.password = createPasswordHash(this.password)
   }
 }

@@ -11,14 +11,6 @@ export default class PetController {
   async createPet(req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>, res: Response<TypeResponseBodyPet>) {
     const { name, adoption, species, size, dateOfBirth } = req.body as Pet
 
-    if (!Object.values(EnumSpecies).includes(species)) {
-      return res.status(400).json({ message: 'Invalid species' })
-    }
-
-    if (size && !(size in EnumSize)) {
-      return res.status(400).json({ message: 'Invalid size' })
-    }
-
     const newPet: Pet = new Pet(name, species, dateOfBirth, adoption, size)
 
     await this.repository.createPet(newPet)
@@ -27,7 +19,7 @@ export default class PetController {
         id: newPet.id,
         name: newPet.name,
         species: newPet.species,
-        size: newPet.size,
+        size: newPet.size !== null ? newPet.size : undefined,
       },
     })
   }
@@ -46,7 +38,7 @@ export default class PetController {
         id: pet.id,
         name: pet.name,
         species: pet.species,
-        size: pet.size,
+        size: pet.size !== null ? pet.size : undefined,
       },
     })
   }
@@ -54,7 +46,7 @@ export default class PetController {
   async listPets(_req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>, res: Response<TypeResponseBodyPet>) {
     const pets = await this.repository.listPets()
     const data = pets.map(pet => {
-      return { id: pet.id, name: pet.name, species: pet.species, size: pet.size }
+      return { id: pet.id, name: pet.name, species: pet.species, size: pet.size !== null ? pet.size : undefined }
     })
     return res.status(200).json({ data })
   }
