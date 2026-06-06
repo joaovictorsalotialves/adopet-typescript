@@ -1,7 +1,7 @@
 import type { Repository } from 'typeorm'
 import Address from '../entities/Address'
 import type Adopter from '../entities/Adopter'
-import { NotFoundError } from '../utils/errorHandler'
+import { BadRequestError, NotFoundError } from '../utils/errorHandler'
 import type IAdopterRepository from './interfaces/InterfaceAdopterRepository'
 
 export default class AdopterRepository implements IAdopterRepository {
@@ -12,7 +12,17 @@ export default class AdopterRepository implements IAdopterRepository {
   }
 
   async createAdopter(adopter: Adopter): Promise<void> {
+    const existingAdopter = await this.findAdopterByCellPhone(adopter.cellPhone)
+
+    if (existingAdopter) {
+      throw new BadRequestError('Adopter with this cell phone already exists')
+    }
+
     await this.repository.save(adopter)
+  }
+
+  async findAdopterByCellPhone(cellPhone: string): Promise<Adopter | null> {
+    return await this.repository.findOne({ where: { cellPhone } })
   }
 
   async findAdopterById(id: number): Promise<Adopter | null> {

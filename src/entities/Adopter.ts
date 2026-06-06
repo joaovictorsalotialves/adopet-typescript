@@ -11,7 +11,7 @@ export default class Adopter {
   name: string
   @Column()
   password: string
-  @Column()
+  @Column({ unique: true })
   cellPhone: string
   @Column({ nullable: true })
   photo?: string
