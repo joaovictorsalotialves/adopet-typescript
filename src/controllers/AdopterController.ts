@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import Address from '../entities/Address'
 import Adopter from '../entities/Adopter'
+import { EnumHttpStatusCode } from '../enum/EnumHttpStatusCode'
 import type AdopterRepository from '../repositories/AdopterRepository'
 import type { TypeRequestBodyAdopter, TypeRequestParamsAdopter, TypeResponseBodyAdopter } from '../types/TypesAdopter'
 
@@ -16,7 +17,7 @@ export default class AdopterController {
     const newAdopter: Adopter = new Adopter(name, password, cellPhone, photo, address)
 
     await this.repository.createAdopter(newAdopter)
-    return res.status(201).json({ data: newAdopter })
+    return res.status(EnumHttpStatusCode.CREATED).json({ data: newAdopter })
   }
 
   async findAdopterById(
@@ -28,10 +29,10 @@ export default class AdopterController {
     const adopter = await this.repository.findAdopterById(Number(id))
 
     if (!adopter) {
-      return res.status(404).json({ message: 'Adopter not found' })
+      return res.status(EnumHttpStatusCode.NOT_FOUND).json({ message: 'Adopter not found' })
     }
 
-    return res.status(200).json({
+    return res.status(EnumHttpStatusCode.OK).json({
       data: {
         id: adopter.id,
         name: adopter.name,
@@ -54,7 +55,7 @@ export default class AdopterController {
         address: adopter.address !== null ? adopter.address : undefined,
       }
     })
-    return res.status(200).json({ data })
+    return res.status(EnumHttpStatusCode.OK).json({ data })
   }
 
   async updateAdopter(
@@ -67,16 +68,17 @@ export default class AdopterController {
     const adopter = await this.repository.findAdopterById(Number(id))
 
     if (!adopter) {
-      return res.status(404).json({ message: 'Adopter not found' })
+      return res.status(EnumHttpStatusCode.NOT_FOUND).json({ message: 'Adopter not found' })
     }
 
     const updatedAdopter = await this.repository.updateAdopter(Number(id), data)
 
-    return res.status(200).json({
+    return res.status(EnumHttpStatusCode.OK).json({
       data: {
         id: updatedAdopter.id,
         name: updatedAdopter.name,
         cellPhone: updatedAdopter.cellPhone,
+        address: updatedAdopter.address !== null ? updatedAdopter.address : undefined,
       },
     })
   }
@@ -90,12 +92,12 @@ export default class AdopterController {
     const adopter = await this.repository.findAdopterById(Number(id))
 
     if (!adopter) {
-      return res.status(404).json({ message: 'Adopter not found' })
+      return res.status(EnumHttpStatusCode.NOT_FOUND).json({ message: 'Adopter not found' })
     }
 
     await this.repository.deleteAdopter(Number(id))
 
-    return res.status(200).json({ message: 'Adopter deleted successfully' })
+    return res.status(EnumHttpStatusCode.OK).json({ message: 'Adopter deleted successfully' })
   }
 
   async updateAddressAdopter(
@@ -110,11 +112,11 @@ export default class AdopterController {
     const adopter = await this.repository.findAdopterById(Number(id))
 
     if (!adopter) {
-      return res.status(404).json({ message: 'Adopter not found' })
+      return res.status(EnumHttpStatusCode.NOT_FOUND).json({ message: 'Adopter not found' })
     }
 
     const updatedAdopter = await this.repository.updateAddressAdopter(Number(id), address)
 
-    return res.status(200).json({ data: updatedAdopter })
+    return res.status(EnumHttpStatusCode.OK).json({ data: updatedAdopter })
   }
 }

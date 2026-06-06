@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import Pet from '../entities/Pet'
+import { EnumHttpStatusCode } from '../enum/EnumHttpStatusCode'
 import EnumSize from '../enum/EnumSize'
 import EnumSpecies from '../enum/EnumSpecies'
 import type PetRepository from '../repositories/PetRepository'
@@ -14,7 +15,7 @@ export default class PetController {
     const newPet: Pet = new Pet(name, species, dateOfBirth, adoption, size)
 
     await this.repository.createPet(newPet)
-    return res.status(201).json({
+    return res.status(EnumHttpStatusCode.CREATED).json({
       data: {
         id: newPet.id,
         name: newPet.name,
@@ -30,10 +31,10 @@ export default class PetController {
     const pet = await this.repository.findPetById(Number(id))
 
     if (!pet) {
-      return res.status(404).json({ message: 'Pet not found' })
+      return res.status(EnumHttpStatusCode.NOT_FOUND).json({ message: 'Pet not found' })
     }
 
-    return res.status(200).json({
+    return res.status(EnumHttpStatusCode.OK).json({
       data: {
         id: pet.id,
         name: pet.name,
@@ -48,7 +49,7 @@ export default class PetController {
     const data = pets.map(pet => {
       return { id: pet.id, name: pet.name, species: pet.species, size: pet.size !== null ? pet.size : undefined }
     })
-    return res.status(200).json({ data })
+    return res.status(EnumHttpStatusCode.OK).json({ data })
   }
 
   async searchPetsBySize(
@@ -58,7 +59,7 @@ export default class PetController {
     const { size } = req.query
 
     if (!Object.values(EnumSize).includes(size as EnumSize)) {
-      return res.status(400).json({ message: 'Invalid size' })
+      return res.status(EnumHttpStatusCode.BAD_REQUEST).json({ message: 'Invalid size' })
     }
 
     const pets = await this.repository.searchPetsBySize(size as EnumSize)
@@ -66,7 +67,7 @@ export default class PetController {
     const data = pets.map(pet => {
       return { id: pet.id, name: pet.name, species: pet.species, size: pet.size }
     })
-    return res.status(200).json({ data })
+    return res.status(EnumHttpStatusCode.OK).json({ data })
   }
 
   async searchPetsByGenericField(
@@ -76,7 +77,7 @@ export default class PetController {
     const { field, value } = req.query
 
     if (!field || !value) {
-      return res.status(400).json({ message: 'Field and value are required' })
+      return res.status(EnumHttpStatusCode.BAD_REQUEST).json({ message: 'Field and value are required' })
     }
 
     const pets = await this.repository.searchPetsByGenericField(field as keyof Pet, value as Pet[keyof Pet])
@@ -84,7 +85,7 @@ export default class PetController {
     const data = pets.map(pet => {
       return { id: pet.id, name: pet.name, species: pet.species, size: pet.size }
     })
-    return res.status(200).json({ data })
+    return res.status(EnumHttpStatusCode.OK).json({ data })
   }
 
   async updatePet(req: Request<TypeRequestParamsPet, {}, TypeRequestBodyPet>, res: Response<TypeResponseBodyPet>) {
@@ -94,16 +95,16 @@ export default class PetController {
     const pet = await this.repository.findPetById(Number(id))
 
     if (!pet) {
-      return res.status(404).json({ message: 'Pet not found' })
+      return res.status(EnumHttpStatusCode.NOT_FOUND).json({ message: 'Pet not found' })
     }
 
     if (!Object.values(EnumSpecies).includes(data.species)) {
-      return res.status(400).json({ message: 'Invalid species' })
+      return res.status(EnumHttpStatusCode.BAD_REQUEST).json({ message: 'Invalid species' })
     }
 
     const updatedPet = await this.repository.updatePet(Number(id), data)
 
-    return res.status(200).json({
+    return res.status(EnumHttpStatusCode.OK).json({
       data: {
         id: updatedPet.id,
         name: updatedPet.name,
@@ -119,12 +120,12 @@ export default class PetController {
     const pet = await this.repository.findPetById(Number(id))
 
     if (!pet) {
-      return res.status(404).json({ message: 'Pet not found' })
+      return res.status(EnumHttpStatusCode.NOT_FOUND).json({ message: 'Pet not found' })
     }
 
     await this.repository.deletePet(Number(id))
 
-    return res.status(200).json({ message: 'Pet deleted successfully' })
+    return res.status(EnumHttpStatusCode.OK).json({ message: 'Pet deleted successfully' })
   }
 
   async addPetToAdopter(
@@ -134,6 +135,6 @@ export default class PetController {
     const { adopterId, petId } = req.params
 
     await this.repository.addPetToAdopter(Number(adopterId), Number(petId))
-    return res.status(200).json({ message: 'Pet added to adopter successfully' })
+    return res.status(EnumHttpStatusCode.OK).json({ message: 'Pet added to adopter successfully' })
   }
 }

@@ -2,6 +2,7 @@ import type { Repository } from 'typeorm'
 import type Adopter from '../entities/Adopter'
 import type Pet from '../entities/Pet'
 import type EnumSize from '../enum/EnumSize'
+import { NotFoundError } from '../utils/errorHandler'
 import type IPetRepository from './interfaces/InterfacePetRepository'
 
 export default class PetRepository implements IPetRepository {
@@ -46,13 +47,13 @@ export default class PetRepository implements IPetRepository {
     const adopter = await this.adopterRepository.findOne({ where: { id: adopterId } })
 
     if (!adopter) {
-      throw new Error('Adopter not found')
+      throw new NotFoundError('Adopter not found')
     }
 
     const pet = await this.findPetById(Number(petId))
 
     if (!pet) {
-      throw new Error('Pet not found')
+      throw new NotFoundError('Pet not found')
     }
 
     pet.adopter = adopter

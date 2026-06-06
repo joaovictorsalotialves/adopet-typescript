@@ -1,6 +1,7 @@
 import type { Repository } from 'typeorm'
 import Address from '../entities/Address'
 import type Adopter from '../entities/Adopter'
+import { NotFoundError } from '../utils/errorHandler'
 import type IAdopterRepository from './interfaces/InterfaceAdopterRepository'
 
 export default class AdopterRepository implements IAdopterRepository {
@@ -35,7 +36,7 @@ export default class AdopterRepository implements IAdopterRepository {
     const adopter = await this.findAdopterById(id)
 
     if (!adopter) {
-      throw new Error('Adopter not found')
+      throw new NotFoundError('Adopter not found')
     }
 
     const newAddress = new Address(address.city, address.state)

@@ -3,6 +3,7 @@ import { AppDataSource } from '../config/dataSource'
 import AdopterController from '../controllers/AdopterController'
 import { middlewareValidateAddressBody } from '../middleware/validators/addressRequestBody'
 import { middlewareValidateAdopterBody } from '../middleware/validators/adopterRequestBody'
+import { verifyIdMiddleware } from '../middleware/verifyId'
 import AdopterRepository from '../repositories/AdopterRepository'
 
 const router = express.Router()
@@ -15,8 +16,10 @@ const validateAddressBody: RequestHandler = (req, res, next) => middlewareValida
 
 router.post('/', validateAdopterBody, (req, res) => adopterController.createAdopter(req, res))
 router.get('/', (req, res) => adopterController.listAdopters(req, res))
-router.put('/:id', (req, res) => adopterController.updateAdopter(req, res))
-router.patch('/:id', validateAddressBody, (req, res) => adopterController.updateAddressAdopter(req, res))
-router.delete('/:id', (req, res) => adopterController.deleteAdopter(req, res))
+router.put('/:id', verifyIdMiddleware, (req, res) => adopterController.updateAdopter(req, res))
+router.patch('/:id', verifyIdMiddleware, validateAddressBody, (req, res) =>
+  adopterController.updateAddressAdopter(req, res)
+)
+router.delete('/:id', verifyIdMiddleware, (req, res) => adopterController.deleteAdopter(req, res))
 
 export default router
