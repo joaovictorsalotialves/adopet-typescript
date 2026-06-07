@@ -8,7 +8,7 @@ import validatorYup from '../../utils/validatorYup'
 
 yup.setLocale(pt)
 
-const schemaPetBody: yup.ObjectSchema<Omit<TypeRequestBodyPet, 'adopter'>> = yup.object({
+const schemaPetBody: yup.ObjectSchema<Omit<TypeRequestBodyPet, 'adopter' | 'shelter'>> = yup.object({
   name: yup.string().defined().required(),
   species: yup.string().oneOf(Object.values(EnumSpecies)).defined().required(),
   size: yup.string().oneOf(Object.values(EnumSize)).defined().required(),
