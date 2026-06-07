@@ -13,6 +13,8 @@ export default class Shelter {
   password: string
   @Column({ unique: true })
   email: string
+  @Column({ unique: true })
+  cellPhone: string
   @OneToOne(() => Address, { nullable: true, cascade: true, eager: true })
   @JoinColumn()
   address?: Address
@@ -22,10 +24,11 @@ export default class Shelter {
   )
   pets!: Pet[]
 
-  constructor(name: string, password: string, email: string, address?: Address) {
+  constructor(name: string, password: string, email: string, cellPhone: string, address?: Address) {
     this.name = name
     this.password = password
     this.email = email
+    this.cellPhone = cellPhone
     this.address = address
   }
 
