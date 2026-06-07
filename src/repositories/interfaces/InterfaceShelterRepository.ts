@@ -4,6 +4,7 @@ import type Shelter from '../../entities/Shelter'
 export default interface IShelterRepository {
   createShelter(shelter: Shelter): Promise<void>
   findShelterById(id: number): Promise<Shelter | null>
+  findShelterByCellPhone(cellPhone: string): Promise<Shelter | null>
   findShelterByEmail(email: string): Promise<Shelter | null>
   listShelters(): Promise<Shelter[]>
   updateShelter(id: number, shelter: Shelter): Promise<Shelter>

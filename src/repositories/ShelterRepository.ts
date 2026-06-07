@@ -12,13 +12,22 @@ export default class ShelterRepository implements IShelterRepository {
   }
 
   async createShelter(shelter: Shelter): Promise<void> {
-    const existingShelter = await this.findShelterByEmail(shelter.email)
+    const existingShelterWithEmail = await this.findShelterByEmail(shelter.email)
+    const existingShelterWithCellPhone = await this.findShelterByCellPhone(shelter.cellPhone)
 
-    if (existingShelter) {
+    if (existingShelterWithEmail) {
       throw new BadRequestError('Shelter with this email already exists')
     }
 
+    if (existingShelterWithCellPhone) {
+      throw new BadRequestError('Shelter with this cell phone already exists')
+    }
+
     await this.repository.save(shelter)
+  }
+
+  async findShelterByCellPhone(cellPhone: string): Promise<Shelter | null> {
+    return await this.repository.findOne({ where: { cellPhone } })
   }
 
   async findShelterByEmail(email: string): Promise<Shelter | null> {
